@@ -1,4 +1,6 @@
-import { useSelector } from '../../services/store';
+import { useSelector, useDispatch, RootState } from '../../services/store';
+import { useEffect } from 'react';
+import { fetchIngredients } from '../../services/reducers/ingredientsReducer';
 
 import styles from './constructor-page.module.css';
 
@@ -8,8 +10,19 @@ import { Preloader } from '../../components/ui';
 import { FC } from 'react';
 
 export const ConstructorPage: FC = () => {
-  /** TODO: взять переменную из стора */
-  const isIngredientsLoading = false;
+  const dispatch = useDispatch();
+  const isIngredientsLoading = useSelector(
+    (state: RootState) => state.ingredients.isLoading
+  );
+
+  const ingredients = useSelector(
+    (state: RootState) => state.ingredients.data
+  );
+
+  // Загружаем ингредиенты при монтировании
+  useEffect(() => {
+    dispatch(fetchIngredients());
+  }, [dispatch]);
 
   return (
     <>
