@@ -14,12 +14,14 @@ import { orderBurgerApi } from '@api';
 export const BurgerConstructor: FC = () => {
   const dispatch = useDispatch();
 
-  const { constructorItems, orderRequest, orderModalData } = useSelector(
-    (state: any) => ({
-      constructorItems: state.burger.constructorItems,
-      orderRequest: state.burger.orderRequest,
-      orderModalData: state.burger.orderModalData
-    })
+  const constructorItems = useSelector(
+    (state: RootState) => state.burger.constructorItems
+  );
+  const orderRequest = useSelector(
+    (state: RootState) => state.burger.orderRequest
+  );
+  const orderModalData = useSelector(
+    (state: RootState) => state.burger.orderModalData
   );
 
   const navigate = useNavigate();

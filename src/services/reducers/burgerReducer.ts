@@ -21,7 +21,7 @@ interface IInitialState {
 const initialState: IInitialState = {
   constructorItems: {
     bun: null,
-    ingredients: [],
+    ingredients: []
   },
   orderRequest: false,
   orderModalData: null,
@@ -57,32 +57,32 @@ export const fetchOrders = createAsyncThunk(
 );
 
 // Асинхронное оформление заказа
-export const makeOrder = createAsyncThunk<any, string[], { rejectValue: string }>(
-  'burger/makeOrder',
-  async (ingredientIds, { rejectWithValue, dispatch }) => {
-    const token = localStorage.getItem('accessToken');
-    console.log('токен из makeOrder', token);
-    try {
-      const data = await orderBurgerApi(ingredientIds);
-      return data.order;
-    } catch (error: any) {
-      if (error.message === 'jwt expired') {
-        const refreshResult = await dispatch(refreshAccessToken());
+export const makeOrder = createAsyncThunk<
+  any,
+  string[],
+  { rejectValue: string }
+>('burger/makeOrder', async (ingredientIds, { rejectWithValue, dispatch }) => {
+  const token = localStorage.getItem('accessToken');
+  try {
+    const data = await orderBurgerApi(ingredientIds);
+    return data.order;
+  } catch (error: any) {
+    if (error.message === 'jwt expired') {
+      const refreshResult = await dispatch(refreshAccessToken());
 
-        if (refreshAccessToken.fulfilled.match(refreshResult)) {
-          const newToken = refreshResult.payload.accessToken;
-          localStorage.setItem('accessToken', newToken);
+      if (refreshAccessToken.fulfilled.match(refreshResult)) {
+        const newToken = refreshResult.payload.accessToken;
+        localStorage.setItem('accessToken', newToken);
 
-          const retryData = await orderBurgerApi(ingredientIds);
-          return retryData.order;
-        } else {
-          return rejectWithValue('Ошибка авторизации');
-        }
+        const retryData = await orderBurgerApi(ingredientIds);
+        return retryData.order;
+      } else {
+        return rejectWithValue('Ошибка авторизации');
       }
-      return rejectWithValue('Ошибка оформления заказа');
     }
+    return rejectWithValue('Ошибка оформления заказа');
   }
-);
+});
 
 // Редюсер с логикой для обработки действий
 const burgerReducer = createSlice({
@@ -98,9 +98,10 @@ const burgerReducer = createSlice({
       }
     },
     removeBurgerIngredient: (state, action) => {
-      state.constructorItems.ingredients = state.constructorItems.ingredients.filter(
-        (_, index) => index !== action.payload
-      );
+      state.constructorItems.ingredients =
+        state.constructorItems.ingredients.filter(
+          (_, index) => index !== action.payload
+        );
     },
     setOrderData: (state, action) => {
       state.orderModalData = action.payload;

@@ -11,11 +11,11 @@ interface TFeedsState {
 }
 
 const initialState: TFeedsState = {
-    orders: [],
-    total: 0,
-    totalToday: 0,
-    isLoading: false,
-    error: undefined,
+  orders: [],
+  total: 0,
+  totalToday: 0,
+  isLoading: false,
+  error: undefined
 };
 
 // Thunk для загрузки заказов авторизованного пользователя
@@ -50,29 +50,42 @@ const feedSlice = createSlice({
   initialState,
   reducers: {},
   selectors: {
-      getOrdersFeeds: (state) => state.orders,
-      getTotalFeeds: (state) => state.total,
-      getTotalTodayFeeds: (state) => state.totalToday,
+    getOrdersFeeds: (state) => state.orders,
+    getTotalFeeds: (state) => state.total,
+    getTotalTodayFeeds: (state) => state.totalToday
   },
   extraReducers: (builder) => {
-      builder
-          .addCase(fetchFeeds.fulfilled, (state, action) => {
-              state.orders = action.payload.orders;
-              state.total = action.payload.total;
-              state.totalToday = action.payload.totalToday;
-              state.isLoading = false;
-          })
-          .addCase(fetchFeeds.rejected, (state, action) => {
-              state.orders = [];
-              state.total = 0;
-              state.totalToday = 0;
-              state.isLoading = false;
-          })
-          .addCase(fetchFeeds.pending, (state) => {
-              state.isLoading = true;
-              state.error = undefined;
-          });
-  },
+    builder
+      .addCase(fetchFeeds.fulfilled, (state, action) => {
+        state.orders = action.payload.orders;
+        state.total = action.payload.total;
+        state.totalToday = action.payload.totalToday;
+        state.isLoading = false;
+      })
+      .addCase(fetchFeeds.rejected, (state, action) => {
+        state.orders = [];
+        state.total = 0;
+        state.totalToday = 0;
+        state.isLoading = false;
+      })
+      .addCase(fetchFeeds.pending, (state) => {
+        state.isLoading = true;
+        state.error = undefined;
+      })
+      .addCase(fetchOrders.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchOrders.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.orders = action.payload;
+      })
+      .addCase(fetchOrders.rejected, (state, action) => {
+        state.orders = [];
+        state.total = 0;
+        state.totalToday = 0;
+        state.isLoading = false;
+      });
+  }
 });
 
 // Экспорт редюсера

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getOrderByNumberApi } from '@api'; 
+import { getOrderByNumberApi } from '@api';
 import { TOrder } from '../../utils/types';
 
 interface OrderState {
@@ -12,7 +12,7 @@ interface OrderState {
 const initialState: OrderState = {
   order: null,
   isLoading: false,
-  error: undefined,
+  error: undefined
 };
 
 // Thunk для загрузки заказа по id
@@ -47,7 +47,7 @@ const orderSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string;
       });
-  },
+  }
 });
 
 export default orderSlice.reducer;

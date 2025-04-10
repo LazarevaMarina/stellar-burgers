@@ -16,21 +16,22 @@ export const Feed: FC = () => {
   }, [dispatch]);
 
   const orders: TOrder[] = useSelector((state: RootState) => state.feed.orders);
+  const isLoading = useSelector((state: RootState) => state.feed.isLoading);
 
-  if (!orders.length) {
+  if (isLoading) {
     return <Preloader />;
   }
-   // Функция для обновления заказов
+  // Функция для обновления заказов
   const handleGetAllFeeds = () => {
     dispatch(fetchFeeds());
   };
 
   return (
     <FeedUI
-        orders={orders}
-        handleGetFeeds={() => {
-            handleGetAllFeeds();
-        }}
+      orders={orders}
+      handleGetFeeds={() => {
+        handleGetAllFeeds();
+      }}
     />
   );
 };

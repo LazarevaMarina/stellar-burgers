@@ -26,8 +26,8 @@ export const OrderInfo: FC = () => {
     [key: string]: TIngredient & { count: number };
   };
 
-  const ingredientsInfo = orderData?.ingredients.reduce(
-    (acc: TIngredientsWithCount, item: string) => {
+  const ingredientsInfo =
+    orderData?.ingredients.reduce((acc, item: string) => {
       const ingredient = ingredients.find((ing) => ing._id === item);
       if (ingredient) {
         if (!acc[item]) {
@@ -37,9 +37,7 @@ export const OrderInfo: FC = () => {
         }
       }
       return acc;
-    },
-    {} as TIngredientsWithCount
-  ) || {} as TIngredientsWithCount;
+    }, {} as TIngredientsWithCount) ?? {};
 
   const total = Object.values(ingredientsInfo || {}).reduce(
     (acc, item) => acc + item.price * item.count,
@@ -50,5 +48,7 @@ export const OrderInfo: FC = () => {
     return <Preloader />;
   }
 
-  return <OrderInfoUI orderInfo={{ ...orderData, ingredientsInfo, date, total }} />;
+  return (
+    <OrderInfoUI orderInfo={{ ...orderData, ingredientsInfo, date, total }} />
+  );
 };

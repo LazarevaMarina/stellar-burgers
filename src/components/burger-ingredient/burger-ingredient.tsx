@@ -1,5 +1,5 @@
 import { FC, memo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 import { addBurgerIngredient } from '../../services/reducers/burgerReducer';

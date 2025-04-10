@@ -27,7 +27,7 @@ interface IngredientState {
 const initialState: IngredientState = {
   data: [] as TIngredient[],
   isLoading: false,
-  error: null,
+  error: null
 };
 
 // Слайс для обработки состояния ингредиентов
@@ -49,7 +49,7 @@ const ingredientsSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload || 'Произошла ошибка'; // Обрабатываем ошибку
       });
-  },
+  }
 });
 
 // Экспорт reducer
