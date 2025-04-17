@@ -1,10 +1,19 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import {
+  createSlice,
+  createAsyncThunk,
+  nanoid,
+  PayloadAction
+} from '@reduxjs/toolkit';
 import {
   getFeedsApi,
   orderBurgerApi,
   refreshToken
 } from '../../utils/burger-api';
-import type { TOrder } from '../../utils/types';
+import type { TIngredient, TOrder } from '../../utils/types';
+
+interface IMovePayload {
+  index: number;
+}
 
 interface IConstructorItems {
   bun: any | null;
@@ -89,19 +98,44 @@ const burgerReducer = createSlice({
   name: 'burger',
   initialState,
   reducers: {
-    addBurgerIngredient: (state, action) => {
-      const ingredient = action.payload;
-      if (ingredient.type === 'bun') {
-        state.constructorItems.bun = ingredient;
-      } else {
-        state.constructorItems.ingredients.push(ingredient);
-      }
+    addBurgerIngredient: {
+      reducer: (
+        state,
+        action: PayloadAction<TIngredient & { uniqueId: string }>
+      ) => {
+        const ingredient = action.payload;
+        if (ingredient.type === 'bun') {
+          state.constructorItems.bun = ingredient;
+        } else {
+          state.constructorItems.ingredients.push(ingredient);
+        }
+      },
+      prepare: (ingredient: TIngredient) => ({
+        payload: {
+          ...ingredient,
+          uniqueId: nanoid()
+        }
+      })
     },
     removeBurgerIngredient: (state, action) => {
       state.constructorItems.ingredients =
         state.constructorItems.ingredients.filter(
           (_, index) => index !== action.payload
         );
+    },
+    moveIngredientUp: (state, action: PayloadAction<IMovePayload>) => {
+      const { index } = action.payload;
+      if (index > 0) {
+        const items = state.constructorItems.ingredients;
+        [items[index - 1], items[index]] = [items[index], items[index - 1]];
+      }
+    },
+    moveIngredientDown: (state, action: PayloadAction<IMovePayload>) => {
+      const { index } = action.payload;
+      const items = state.constructorItems.ingredients;
+      if (index < items.length - 1) {
+        [items[index + 1], items[index]] = [items[index], items[index + 1]];
+      }
     },
     setOrderData: (state, action) => {
       state.orderModalData = action.payload;
@@ -142,6 +176,8 @@ const burgerReducer = createSlice({
 export const {
   addBurgerIngredient,
   removeBurgerIngredient,
+  moveIngredientUp,
+  moveIngredientDown,
   setOrderData,
   setOrderNumber,
   clearConstructorItems

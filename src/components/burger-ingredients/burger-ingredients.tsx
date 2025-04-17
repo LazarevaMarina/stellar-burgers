@@ -1,10 +1,9 @@
-import { useSelector } from 'react-redux';
 import { useState, useRef, useEffect, FC } from 'react';
 import { useInView } from 'react-intersection-observer';
 
 import { TTabMode } from '@utils-types';
 import { BurgerIngredientsUI } from '../ui/burger-ingredients';
-import { RootState } from '../../services/store';
+import { RootState, useSelector } from '../../services/store';
 
 export const BurgerIngredients: FC = () => {
   const ingredients = useSelector((state: RootState) => state.ingredients.data);

@@ -4,9 +4,9 @@ import {
   Routes,
   Route,
   useNavigate,
-  useLocation
+  useLocation,
+  Navigate
 } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 
 import { ConstructorPage } from '@pages';
 import { Feed } from '@pages';
@@ -21,7 +21,7 @@ import { OrderInfo } from '@components';
 import { AppHeader } from '@components';
 import { Modal } from '@components';
 import { NotFound404 } from '@pages';
-import { RootState, useDispatch } from '../../services/store';
+import { RootState, useDispatch, useSelector } from '../../services/store';
 
 import ProtectedRoute from '../ProtectedRoute';
 import PublicRoute from '../PublicRoute';

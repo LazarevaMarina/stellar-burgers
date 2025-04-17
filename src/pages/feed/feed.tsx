@@ -1,7 +1,11 @@
 import { Preloader } from '@ui';
 import { FeedUI } from '@ui-pages';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from 'src/services/store';
+import {
+  RootState,
+  AppDispatch,
+  useSelector,
+  useDispatch
+} from '../../services/store';
 import { TOrder } from '@utils-types';
 import { FC, useEffect, useState } from 'react';
 import { getFeedsApi } from '../../utils/burger-api';
