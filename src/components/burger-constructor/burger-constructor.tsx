@@ -1,4 +1,3 @@
-import { useSelector, useDispatch } from 'react-redux';
 import { FC, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { TConstructorIngredient } from '@utils-types';
@@ -6,20 +5,24 @@ import { BurgerConstructorUI } from '@ui';
 import {
   removeBurgerIngredient,
   makeOrder,
-  setOrderNumber
+  setOrderNumber,
+  setOrderData
 } from '../../services/reducers/burgerReducer';
-import { RootState } from '../../services/store';
+import { RootState, useSelector, useDispatch } from '../../services/store';
 import { orderBurgerApi } from '@api';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 export const BurgerConstructor: FC = () => {
   const dispatch = useDispatch();
 
-  const { constructorItems, orderRequest, orderModalData } = useSelector(
-    (state: any) => ({
-      constructorItems: state.burger.constructorItems,
-      orderRequest: state.burger.orderRequest,
-      orderModalData: state.burger.orderModalData
-    })
+  const constructorItems = useSelector(
+    (state: RootState) => state.burger.constructorItems
+  );
+  const orderRequest = useSelector(
+    (state: RootState) => state.burger.orderRequest
+  );
+  const orderModalData = useSelector(
+    (state: RootState) => state.burger.orderModalData
   );
 
   const navigate = useNavigate();
@@ -41,20 +44,19 @@ export const BurgerConstructor: FC = () => {
       ),
       constructorItems.bun._id
     ];
-    dispatch(makeOrder(ingredientIds) as any);
 
     try {
-      const res = await orderBurgerApi(ingredientIds);
-      if (res.success) {
-        dispatch(setOrderNumber(res.order.number));
-        navigate(`/order/details/${res.order.number}`);
-      }
+      const resultAction = await dispatch(makeOrder(ingredientIds));
+      const order = unwrapResult(resultAction);
+      dispatch(setOrderData(order));
     } catch (error) {
       console.log(error);
     }
   };
 
-  const closeOrderModal = () => {}; //вернуться к этому вопросу
+  const closeOrderModal = () => {
+    dispatch(setOrderData(null));
+  };
 
   const handleRemoveIngredient = (index: number) => {
     dispatch(removeBurgerIngredient(index));

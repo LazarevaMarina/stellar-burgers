@@ -4,7 +4,8 @@ import {
   loginUserApi,
   registerUserApi,
   TLoginData,
-  TRegisterData
+  TRegisterData,
+  updateUserApi
 } from '../../utils/burger-api';
 import { refreshAccessToken } from './burgerReducer';
 import {
@@ -69,12 +70,23 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+export const changeUserData = createAsyncThunk(
+  'auth/changeUserData',
+  async (data: TRegisterData, { rejectWithValue }) => {
+    try {
+      const response = await updateUserApi(data);
+      return response;
+    } catch (e) {
+      return rejectWithValue('Ошибка смены данных');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
     logout: (state) => {
-      console.log(123);
       deleteCookie('accessToken');
       deleteCookie('refreshToken');
       localStorage.removeItem('accessToken');
@@ -110,6 +122,15 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(getUserData.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
+        state.user = action.payload.user;
+      })
+      .addCase(changeUserData.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(changeUserData.fulfilled, (state, action) => {
         state.isLoading = false;
         state.error = null;
         state.user = action.payload.user;

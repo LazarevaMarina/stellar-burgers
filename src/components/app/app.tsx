@@ -3,9 +3,10 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  useNavigate
+  useNavigate,
+  useLocation,
+  Navigate
 } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 
 import { ConstructorPage } from '@pages';
 import { Feed } from '@pages';
@@ -20,17 +21,21 @@ import { OrderInfo } from '@components';
 import { AppHeader } from '@components';
 import { Modal } from '@components';
 import { NotFound404 } from '@pages';
-import { RootState, useDispatch } from '../../services/store';
+import { RootState, useDispatch, useSelector } from '../../services/store';
 
 import ProtectedRoute from '../ProtectedRoute';
+import PublicRoute from '../PublicRoute';
 import { OrderDetails } from '../order-details';
 import { getUserData } from '../../services/reducers/authReducer';
+import { fetchOrders } from '../../services/reducers/feedReducer';
 
 const App = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<JSX.Element | null>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
+  const state = location.state as { background?: Location };
 
   const isAuthenticated = !!useSelector((state: RootState) => state.auth.user);
 
@@ -49,19 +54,51 @@ const App = () => {
 
   useEffect(() => {
     dispatch(getUserData());
+    dispatch(fetchOrders());
   }, []);
 
   return (
     <div className='App'>
       <AppHeader />
-      <Routes>
-        {/* Основные маршруты */}
+      {/* Основные маршруты */}
+      <Routes location={state?.background || location}>
         <Route path='/' element={<ConstructorPage />} />
+        <Route path='/ingredients/:id' element={<IngredientDetails />} />
         <Route path='/feed' element={<Feed />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/register' element={<Register />} />
-        <Route path='/forgot-password' element={<ForgotPassword />} />
-        <Route path='/reset-password' element={<ResetPassword />} />
+        <Route path='/order/details/:number' element={null} />
+        <Route path='*' element={<NotFound404 />} />
+        <Route
+          path='/login'
+          element={
+            <PublicRoute isAuthenticated={isAuthenticated}>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path='/register'
+          element={
+            <PublicRoute isAuthenticated={isAuthenticated}>
+              <Register />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path='/forgot-password'
+          element={
+            <PublicRoute isAuthenticated={isAuthenticated}>
+              <ForgotPassword />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path='/reset-password'
+          element={
+            <PublicRoute isAuthenticated={isAuthenticated}>
+              <ResetPassword />
+            </PublicRoute>
+          }
+        />
 
         {/* Защищённые маршруты */}
         <Route
@@ -80,9 +117,18 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-        <Route path='*' element={<NotFound404 />} />
+      </Routes>
 
-        {/* Модальные окна */}
+      {/* Модальные окна */}
+      <Routes>
+        <Route
+          path='/order/details/:number'
+          element={
+            <Modal title='' onClose={handleCloseModal}>
+              <OrderDetails />
+            </Modal>
+          }
+        />
         <Route
           path='/feed/:number'
           element={
@@ -95,33 +141,32 @@ const App = () => {
           }
         />
         <Route
-          path='/ingredients/:id'
-          element={
-            <Modal title='Ingredient Details' onClose={handleCloseModal}>
-              <IngredientDetails />
-            </Modal>
-          }
-        />
-        <Route
           path='/profile/orders/:number'
           element={
-            <Modal
-              title={`#${orderData?.number?.toString() || 'Order Info'}`}
-              onClose={handleCloseModal}
-            >
-              <OrderInfo />
-            </Modal>
-          }
-        />
-        <Route
-          path='/order/details/:number'
-          element={
-            <Modal title='' onClose={handleCloseModal}>
-              <OrderDetails />
-            </Modal>
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <Modal
+                title={`#${orderData?.number?.toString() || 'Order Info'}`}
+                onClose={handleCloseModal}
+              >
+                <OrderInfo />
+              </Modal>
+            </ProtectedRoute>
           }
         />
       </Routes>
+
+      {state?.background && (
+        <Routes>
+          <Route
+            path='/ingredients/:id'
+            element={
+              <Modal title='Ingredient Details' onClose={handleCloseModal}>
+                <IngredientDetails />
+              </Modal>
+            }
+          />
+        </Routes>
+      )}
     </div>
   );
 };

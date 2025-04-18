@@ -17,9 +17,5 @@ export const ProfileMenu: FC = () => {
     window.location.reload();
   };
 
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
-
   return <ProfileMenuUI handleLogout={handleLogout} pathname={pathname} />;
 };

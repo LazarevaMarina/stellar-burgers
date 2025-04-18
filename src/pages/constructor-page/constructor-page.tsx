@@ -14,10 +14,7 @@ export const ConstructorPage: FC = () => {
   const isIngredientsLoading = useSelector(
     (state: RootState) => state.ingredients.isLoading
   );
-
-  const ingredients = useSelector(
-    (state: RootState) => state.ingredients.data
-  );
+  const ingredients = useSelector((state: RootState) => state.ingredients.data);
 
   // Загружаем ингредиенты при монтировании
   useEffect(() => {

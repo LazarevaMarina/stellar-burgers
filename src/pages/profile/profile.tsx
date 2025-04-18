@@ -1,13 +1,15 @@
 import { ProfileUI } from '@ui-pages';
 import { FC, SyntheticEvent, useEffect, useState } from 'react';
+import { RootState, useDispatch, useSelector } from '../../services/store';
+import { changeUserData } from '../../services/reducers/authReducer';
 
 export const Profile: FC = () => {
-  /** TODO: взять переменную из стора */
-  const user = { name: '', email: '' };
+  const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch();
 
   const [formValue, setFormValue] = useState({
-    name: user.name,
-    email: user.email,
+    name: user?.name ?? '',
+    email: user?.email ?? '',
     password: ''
   });
 
@@ -18,11 +20,16 @@ export const Profile: FC = () => {
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
+    dispatch(changeUserData(formValue));
   };
 
   const handleCancel = (e: SyntheticEvent) => {
     e.preventDefault();
-    setFormValue({ name: user.name, email: user.email, password: '' });
+    setFormValue({
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      password: ''
+    });
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
