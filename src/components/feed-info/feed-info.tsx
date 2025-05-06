@@ -10,22 +10,21 @@ const getOrders = (orders: TOrder[], status: string): number[] =>
     .slice(0, 20);
 
 export const FeedInfo: FC = memo(() => {
-    const orders = useSelector((state: RootState) => state.feed.orders);
-    const total = useSelector((state: RootState) => state.feed.total);
-    const totalToday = useSelector((state: RootState) => state.feed.totalToday);
+  const orders = useSelector((state: RootState) => state.feed.orders);
+  const total = useSelector((state: RootState) => state.feed.total);
+  const totalToday = useSelector((state: RootState) => state.feed.totalToday);
 
-    const readyOrders = getOrders(orders, 'done');
-    const pendingOrders = getOrders(orders, 'pending');
+  const readyOrders = getOrders(orders, 'done');
+  const pendingOrders = getOrders(orders, 'pending');
 
-    return (
-      <FeedInfoUI
-        readyOrders={readyOrders.length ? readyOrders : [0]}
-        pendingOrders={pendingOrders.length ? pendingOrders : [0]}
-        feed={{
-          total: total || 0,
-          totalToday: totalToday || 0
-        }} 
-      />
-    );
-  }
-);
+  return (
+    <FeedInfoUI
+      readyOrders={readyOrders.length ? readyOrders : [0]}
+      pendingOrders={pendingOrders.length ? pendingOrders : [0]}
+      feed={{
+        total: total || 0,
+        totalToday: totalToday || 0
+      }}
+    />
+  );
+});

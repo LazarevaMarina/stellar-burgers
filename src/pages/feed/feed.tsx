@@ -1,7 +1,11 @@
 import { Preloader } from '@ui';
 import { FeedUI } from '@ui-pages';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from 'src/services/store';
+import {
+  RootState,
+  AppDispatch,
+  useSelector,
+  useDispatch
+} from '../../services/store';
 import { TOrder } from '@utils-types';
 import { FC, useEffect, useState } from 'react';
 import { getFeedsApi } from '../../utils/burger-api';
@@ -16,21 +20,22 @@ export const Feed: FC = () => {
   }, [dispatch]);
 
   const orders: TOrder[] = useSelector((state: RootState) => state.feed.orders);
+  const isLoading = useSelector((state: RootState) => state.feed.isLoading);
 
-  if (!orders.length) {
+  if (isLoading) {
     return <Preloader />;
   }
-   // Функция для обновления заказов
+  // Функция для обновления заказов
   const handleGetAllFeeds = () => {
     dispatch(fetchFeeds());
   };
 
   return (
     <FeedUI
-        orders={orders}
-        handleGetFeeds={() => {
-            handleGetAllFeeds();
-        }}
+      orders={orders}
+      handleGetFeeds={() => {
+        handleGetAllFeeds();
+      }}
     />
   );
 };

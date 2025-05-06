@@ -1,24 +1,27 @@
 import { FC, useMemo, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { Preloader } from '../ui/preloader';
 import { OrderInfoUI } from '../ui/order-info';
 import { TIngredient } from '@utils-types';
 import { fetchOrderById } from '../../services/reducers/orderReducer';
-import { RootState, AppDispatch } from '../../services/store';
+import { fetchFeeds } from '../../services/reducers/feedReducer';
+import { RootState, useSelector, useDispatch } from '../../services/store';
 
 export const OrderInfo: FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
   const { number } = useParams<{ number: string }>();
-
-  useEffect(() => {
-    if (number) {
-      dispatch(fetchOrderById(number));
-    }
-  }, [number, dispatch]);
 
   const orderData = useSelector((state: RootState) => state.order.order);
   const ingredients = useSelector((state: RootState) => state.ingredients.data);
+
+  useEffect(() => {
+    if (ingredients.length === 0) {
+      dispatch(fetchFeeds());
+    }
+    if (number) {
+      dispatch(fetchOrderById(number));
+    }
+  }, [number, dispatch, ingredients.length]);
 
   const date = orderData ? new Date(orderData.createdAt) : new Date();
 
@@ -26,8 +29,8 @@ export const OrderInfo: FC = () => {
     [key: string]: TIngredient & { count: number };
   };
 
-  const ingredientsInfo = orderData?.ingredients.reduce(
-    (acc: TIngredientsWithCount, item: string) => {
+  const ingredientsInfo =
+    orderData?.ingredients.reduce((acc, item: string) => {
       const ingredient = ingredients.find((ing) => ing._id === item);
       if (ingredient) {
         if (!acc[item]) {
@@ -37,9 +40,7 @@ export const OrderInfo: FC = () => {
         }
       }
       return acc;
-    },
-    {} as TIngredientsWithCount
-  ) || {} as TIngredientsWithCount;
+    }, {} as TIngredientsWithCount) ?? {};
 
   const total = Object.values(ingredientsInfo || {}).reduce(
     (acc, item) => acc + item.price * item.count,
@@ -50,5 +51,7 @@ export const OrderInfo: FC = () => {
     return <Preloader />;
   }
 
-  return <OrderInfoUI orderInfo={{ ...orderData, ingredientsInfo, date, total }} />;
+  return (
+    <OrderInfoUI orderInfo={{ ...orderData, ingredientsInfo, date, total }} />
+  );
 };
