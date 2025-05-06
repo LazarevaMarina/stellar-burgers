@@ -1,4 +1,5 @@
 /// <reference types="cypress" />
+const fakeToken = 'fake-jwt-token';
 
 describe('Burger Constructor', () => {
   beforeEach(() => {
@@ -10,7 +11,15 @@ describe('Burger Constructor', () => {
     cy.visit('/');
     cy.wait('@getIngredients');
     cy.wait('@getUser');
+
+    window.localStorage.setItem('accessToken', `Bearer ${fakeToken}`);
+    cy.setCookie('accessToken', `Bearer ${fakeToken}`);
   });
+
+  afterEach(() => {
+    window.localStorage.removeItem('accessToken');
+    cy.clearCookie('accessToken');
+  });  
   
   it('добавляет ингредиенты в конструктор', () => {
     // Добавляем булку
@@ -28,9 +37,22 @@ describe('Burger Constructor', () => {
   });
     
   it('открывает и закрывает модалку ингредиента', () => {
-    cy.get('[data-test=ingredient-card]').first().click();
+    // Проверка, что модалка изначально отсутствует
+    cy.get('[data-test=modal]').should('not.exist');
+
+    // Клик по ингредиенту
+    cy.get('[data-test=ingredient-card]').contains('Protostomia').click();
+
+    // Проверка, что модалка появилась
     cy.get('[data-test=modal]').should('exist');
+
+    // Проверка, что модалка отображает корректные данные
+    cy.get('[data-test=modal]').should('contain', 'Protostomia');
+
+    // Закрытие модалки
     cy.get('[data-test=modal-close]').click();
+
+    // Проверка, что модалка закрылась
     cy.get('[data-test=modal]').should('not.exist');
   });
 
@@ -92,7 +114,11 @@ describe('Burger Constructor', () => {
   it('закрывает модалку заказа и очищает конструктор', () => {
     cy.intercept('GET', '**/ingredients', { fixture: 'ingredients.json' }).as('getIngredients');
     cy.intercept('GET', '**/auth/user', { fixture: 'user.json' }).as('getUser');
-    cy.intercept('POST', '**/orders', { fixture: 'order.json' }).as('createOrder');
+    //cy.intercept('POST', '**/orders', { fixture: 'order.json' }).as('createOrder');
+    cy.intercept('POST', '**/orders', (req) => {
+      expect(req.headers.authorization).to.eq(`Bearer ${fakeToken}`);
+      req.reply({ fixture: 'order.json' });
+    }).as('createOrder');
 
     // Переход на главную и ожидание загрузки
     cy.visit('/');
